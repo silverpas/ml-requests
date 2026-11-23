@@ -1,0 +1,160 @@
+# The request form (step 1). GitHub shows it under Issues → New issue.
+# Fields marked "→ registry" become the use case's YAML file in the platform
+# repo (registry/ml_use_cases/<department>__<use_case_id>.yaml) after "go".
+# Keep the field formats in sync with that file's JSON schema.
+name: ML project request
+description: Propose a new machine learning use case.
+title: "[ML request] <short name>"
+labels: ["new"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for your idea! Fill in what you know; the platform lead will help
+        with the rest. **No passwords, keys or real customer data in this form.**
+        How it works: [docs/process.md](../blob/main/docs/process.md).
+
+  # ---- The problem ----
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem and value
+      description: What goes wrong today, and what is it worth if a model helps? Rough numbers are fine.
+      placeholder: "Tools wear out and break machines without warning: about 10 unplanned stops a month."
+    validations:
+      required: true
+
+  - type: textarea
+    id: usage
+    attributes:
+      label: How will the predictions be used?
+      description: Who looks at them, where (report, screen, alert) and what do they decide with them?
+      placeholder: "Maintenance planners see a daily failure risk per machine in a Power BI report and plan tool changes."
+    validations:
+      required: true
+
+  - type: textarea
+    id: explored
+    attributes:
+      label: What did you already try? (optional)
+      description: Step 0 "explore". A notebook, a simple rule, a first model, a link.
+
+  # ---- Names (→ registry) ----
+  - type: input
+    id: use_case_id
+    attributes:
+      label: Use case name (→ registry use_case_id)
+      description: "Short, lowercase, hyphens only, 3-24 characters. Becomes the model name and the repo name ml-<name>."
+      placeholder: tool-wear
+    validations:
+      required: true
+
+  - type: input
+    id: display_name
+    attributes:
+      label: Readable name (→ registry display_name)
+      placeholder: Tool wear prediction
+
+  - type: input
+    id: department
+    attributes:
+      label: Department (→ registry department)
+      description: Lowercase, hyphens only. The department's Azure ML workspace is shared by its use cases.
+      placeholder: manufacturing
+    validations:
+      required: true
+
+  # ---- People ----
+  - type: input
+    id: owner
+    attributes:
+      label: Model owner (→ registry owner)
+      description: The person or team who builds, runs and reviews the model.
+      placeholder: "[name or team]"
+    validations:
+      required: true
+
+  - type: input
+    id: sponsor
+    attributes:
+      label: Business sponsor
+      description: Who wants this and will use the result?
+      placeholder: "[name or team]"
+    validations:
+      required: true
+
+  # ---- Risk ----
+  - type: dropdown
+    id: risk_tier
+    attributes:
+      label: Risk tier, your proposal (→ registry risk_tier)
+      description: What happens if a prediction is wrong? The platform lead confirms it at qualification.
+      options:
+        - "exploration: analysis or prototype, never goes live"
+        - "decision_support: predictions shown in reports, a person decides"
+        - "production_critical: affects machines or operations directly"
+    validations:
+      required: true
+
+  # ---- Data ----
+  - type: textarea
+    id: reads
+    attributes:
+      label: Data the model needs (→ registry reads)
+      description: |
+        One table per line as <domain>.<layer>.<table>. Not in the platform yet,
+        or you don't know the name? Describe it in words: that becomes a data request.
+      placeholder: manufacturing.gold.fact_machine_sensors
+    validations:
+      required: true
+
+  - type: dropdown
+    id: sensitivity
+    attributes:
+      label: Most sensitive data involved
+      description: Personal data needs extra checks before "go".
+      options:
+        - Public
+        - Internal
+        - Confidential
+        - Personal data
+        - Don't know
+    validations:
+      required: true
+
+  - type: input
+    id: predictions_table
+    attributes:
+      label: Predictions table (→ registry predictions_table, optional)
+      description: "Gold table the predictions go to. Must start with ml_. Leave empty for ml_<use case name>_predictions."
+      placeholder: ml_tool_wear_predictions
+
+  # ---- Compute and review ----
+  - type: dropdown
+    id: gpu
+    attributes:
+      label: Does the model need a GPU? (→ registry gpu)
+      description: Only for deep learning (images, sound, long texts). Tables almost never need one.
+      options:
+        - "No (CPU is enough)"
+        - "Yes"
+        - "Don't know"
+    validations:
+      required: true
+
+  - type: input
+    id: review
+    attributes:
+      label: When should we check if the model is still useful?
+      description: A date or event, e.g. "after 3 months" or "end of Q2". Reviews then repeat every quarter.
+      placeholder: after 3 months
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: Before you submit
+      options:
+        - label: This issue contains no passwords, keys or real customer data.
+          required: true
